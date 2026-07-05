@@ -54,6 +54,10 @@ function do_install() {
     echo "Saving PM2 process list..."
     pm2 save
 
+    echo "Configuring auto-restart on system boot..."
+    # Lệnh này sẽ thiết lập systemd tự động chạy lại PM2 mỗi khi khởi động lại server
+    pm2 startup || echo "⚠️ Vui lòng chạy lệnh 'pm2 startup' thủ công để kích hoạt tự khởi động."
+
     echo "--------------------------------------------------"
     echo "✨ Simple Note installed successfully!"
     echo "Access it at: http://localhost:22099"
