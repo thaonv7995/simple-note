@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { randomBytes, randomInt } from "node:crypto";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile, stat } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -135,7 +135,7 @@ export function createNoteServer({ dataDir = path.join(projectDir, "data") } = {
           let content = "";
           let updatedAt = null;
           try {
-            const fileStat = await import("node:fs/promises").then(fs => fs.stat(notePath));
+            const fileStat = await stat(notePath);
             updatedAt = fileStat.mtime.toISOString();
             content = await readFile(notePath, "utf8");
           } catch (error) {
@@ -168,7 +168,7 @@ export function createNoteServer({ dataDir = path.join(projectDir, "data") } = {
 
           if (payload.updatedAt) {
             try {
-              const currentStat = await import("node:fs/promises").then(fs => fs.stat(notePath));
+              const currentStat = await stat(notePath);
               if (currentStat.mtime.toISOString() !== payload.updatedAt) {
                 sendJson(response, 409, { error: "Conflict: Note was modified by another user" });
                 return;
@@ -183,7 +183,7 @@ export function createNoteServer({ dataDir = path.join(projectDir, "data") } = {
           await writeFile(temporaryPath, payload.content, "utf8");
           await rename(temporaryPath, notePath);
 
-          const savedStat = await import("node:fs/promises").then(fs => fs.stat(notePath));
+          const savedStat = await stat(notePath);
           sendJson(response, 200, {
             saved: true,
             updatedAt: savedStat.mtime.toISOString()
