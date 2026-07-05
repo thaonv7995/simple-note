@@ -43,6 +43,15 @@ const saveStatusText = document.querySelector("#save-status-text");
 const noteId = window.location.pathname.split("/").filter(Boolean).at(-1);
 const endpoint = `/api/notes/${encodeURIComponent(noteId)}`;
 
+document.body.addEventListener("click", (e) => {
+  if (e.target.closest('a, button, input')) return;
+  if (editor && (e.target.closest('.paper') || e.target.closest('.shell'))) {
+    if (!editor.isFocused) {
+      editor.commands.focus('end');
+    }
+  }
+});
+
 let savedContent = "";
 let isSaving = false;
 let saveAgain = false;
@@ -70,7 +79,7 @@ async function loadNote() {
     const data = await response.json();
     savedContent = data.content || "";
     lastUpdatedAt = data.updatedAt;
-    document.title = `Process Note · ${noteId.slice(0, 6)}`;
+    document.title = `Simple Note · ${noteId.slice(0, 6)}`;
     showStatus("Đã mở", "hidden");
 
     initEditor(savedContent);
