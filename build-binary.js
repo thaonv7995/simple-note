@@ -9,16 +9,28 @@ const faviconSvg = fs.readFileSync('public/favicon.svg', 'utf8');
 let serverCode = fs.readFileSync('server.js', 'utf8');
 
 const staticCode = `
-      if (ext === ".html") { res.setHeader("Cache-Control", "no-cache"); res.writeHead(200, { "Content-Type": "text/html" }); return res.end(${JSON.stringify(indexHtml)}); }
-      if (ext === ".css") { res.setHeader("Cache-Control", "public, max-age=31536000"); res.writeHead(200, { "Content-Type": "text/css" }); return res.end(${JSON.stringify(styleCss)}); }
-      if (ext === ".js") { res.setHeader("Cache-Control", "public, max-age=31536000"); res.writeHead(200, { "Content-Type": "application/javascript" }); return res.end(${JSON.stringify(bundleJs)}); }
-      if (ext === ".svg") { res.setHeader("Cache-Control", "public, max-age=31536000"); res.writeHead(200, { "Content-Type": "image/svg+xml" }); return res.end(${JSON.stringify(faviconSvg)}); }
-      res.writeHead(404); return res.end("Not Found");
+  async function serveFile(response, filename, contentType, cacheControl = "no-cache") {
+      let content = "";
+      if (filename === "index.html") { content = ${JSON.stringify(indexHtml)}; }
+      else if (filename === "style.css" || filename.includes("style.css")) { content = ${JSON.stringify(styleCss)}; }
+      else if (filename === "bundle.js" || filename.includes("bundle.js")) { content = ${JSON.stringify(bundleJs)}; }
+      else if (filename === "favicon.svg" || filename.includes("favicon.svg")) { content = ${JSON.stringify(faviconSvg)}; }
+      else {
+          sendJson(response, 404, { error: "Not found" });
+          return;
+      }
+      response.writeHead(200, {
+        "Content-Type": contentType,
+        "Content-Length": Buffer.byteLength(content, "utf8"),
+        "Cache-Control": cacheControl
+      });
+      response.end(content);
+  }
 `;
 
 serverCode = serverCode.replace(
-  /fs\.readFile\(filePath[\s\S]*?\}\);[\s\S]*?return;/m,
-  staticCode
+  /async function serveFile\([\s\S]*?\}\n\}/m,
+  () => staticCode
 );
 
 serverCode = serverCode.replace(
