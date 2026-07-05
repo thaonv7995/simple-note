@@ -39,7 +39,8 @@ function do_install() {
     mkdir -p "$INSTALL_DIR/data"
 
     echo "Downloading binary from GitHub Releases..."
-    curl -# -L "$DOWNLOAD_URL" -o "$INSTALL_DIR/$APP_NAME"
+    curl -# -L "$DOWNLOAD_URL" -o "$INSTALL_DIR/${APP_NAME}.tmp"
+    mv -f "$INSTALL_DIR/${APP_NAME}.tmp" "$INSTALL_DIR/$APP_NAME"
     chmod +x "$INSTALL_DIR/$APP_NAME"
 
     # Setup systemd if on Linux
