@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Simple Note</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/style.css?v=16" />
+    <script src="/assets/bundle.js?v=16" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="paper" aria-label="Trang ghi chú">
+        <span id="save-status" data-state="hidden" role="status" aria-live="polite">
+          <svg class="status-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <g class="status-mark status-mark--saved">
+              <circle cx="12" cy="12" r="8" />
+              <path d="m8.5 12 2.2 2.2 4.8-5" />
+            </g>
+            <g class="status-mark status-mark--dirty">
+              <circle cx="12" cy="12" r="8" />
+              <circle class="status-dot" cx="12" cy="12" r="2.5" />
+            </g>
+            <g class="status-mark status-mark--loading">
+              <circle cx="12" cy="12" r="8" />
+            </g>
+            <g class="status-mark status-mark--error">
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 8v5M12 16h.01" />
+            </g>
+          </svg>
+          <span id="save-status-text" class="sr-only">Đang mở…</span>
+        </span>
+        <div id="editor" class="editor-container"></div>
+      </section>
+    </main>
+  </body>
+</html>
