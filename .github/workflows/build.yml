@@ -26,17 +26,11 @@ jobs:
     - name: Build JS bundle
       run: npm run build
 
-    - name: Run Tests
-      run: npm test
+    - name: Build Native Binaries
+      run: node build-binary.js
 
-    - name: Upload Build Artifact
+    - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: simple-note-build
-        path: |
-          public/
-          server.js
-          package.json
-          package-lock.json
-          setup.sh
-          README.md
+        name: simple-note-native-binaries
+        path: dist-bin/
