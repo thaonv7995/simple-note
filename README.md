@@ -19,8 +19,6 @@ Fast, lightweight, and supports Markdown editing with live preview.
 
 You can install, update, or remove Simple Note using our automated script. It requires Node.js (v20+) to be installed on your system.
 
-*Note: Replace `thaonv7995` with your actual GitHub username where you host this repository.*
-
 ### 1. Install
 
 Run this command in your terminal:
