@@ -17,7 +17,7 @@ Fast, lightweight, and supports Markdown editing with live preview.
 
 ## 🚀 Quick Installation (One-line command)
 
-You can install, update, or remove Simple Note using our automated script. It requires Node.js (v20+) to be installed on your system.
+You can install, update, or remove Simple Note using our automated script. **No Node.js or PM2 required!** The script automatically downloads a Native Binary for your system (Linux or Mac) and runs it as a background service.
 
 ### 1. Install
 
@@ -27,9 +27,8 @@ Run this command in your terminal:
 curl -sL https://raw.githubusercontent.com/thaonv7995/simple-note/main/setup.sh | bash -s -- install
 ```
 This will:
-1. Clone the app to `~/.simple-note`.
-2. Install dependencies and build the frontend bundle.
-3. Automatically start it in the background using `pm2` on port **22099**.
+1. Download the latest native executable to `~/.simple-note`.
+2. Automatically start it in the background (using `systemd` on Linux, or `nohup` on Mac) on port **22099**.
 
 You can then access your notes at: **[http://localhost:22099](http://localhost:22099)**
 

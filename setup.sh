@@ -1,62 +1,84 @@
 #!/bin/bash
 
-# Simple Note Installation Script
+# Simple Note Installation Script (Native Binary Version)
 # Usage:
 # curl -sL https://raw.githubusercontent.com/thaonv7995/simple-note/main/setup.sh | bash -s -- install
 # curl -sL https://raw.githubusercontent.com/thaonv7995/simple-note/main/setup.sh | bash -s -- update
 # curl -sL https://raw.githubusercontent.com/thaonv7995/simple-note/main/setup.sh | bash -s -- remove
 
-REPO_URL="https://github.com/thaonv7995/simple-note.git"
 INSTALL_DIR="$HOME/.simple-note"
 APP_NAME="simple-note"
+SERVICE_NAME="simple-note.service"
 
-function check_node() {
-    if ! command -v node &> /dev/null; then
-        echo "Node.js is not installed. Please install Node.js (v20+) first."
-        exit 1
-    fi
-    if ! command -v npm &> /dev/null; then
-        echo "npm is not installed. Please install npm."
-        exit 1
-    fi
-}
+OS="$(uname -s)"
+ARCH="$(uname -m)"
 
-function install_pm2() {
-    if ! command -v pm2 &> /dev/null; then
-        echo "Installing PM2 globally (might require sudo)..."
-        npm install -g pm2
+if [ "$OS" = "Linux" ]; then
+    BIN_NAME="server-linux-x64"
+elif [ "$OS" = "Darwin" ]; then
+    if [ "$ARCH" = "arm64" ]; then
+        BIN_NAME="server-macos-arm64"
+    else
+        BIN_NAME="server-macos-x64"
     fi
-}
+else
+    echo "Unsupported OS: $OS"
+    exit 1
+fi
+
+DOWNLOAD_URL="https://github.com/thaonv7995/simple-note/releases/latest/download/$BIN_NAME"
 
 function do_install() {
-    echo "Installing Simple Note..."
-    check_node
-    install_pm2
+    echo "Installing Simple Note (Native Binary)..."
 
     if [ -d "$INSTALL_DIR" ]; then
-        echo "Directory $INSTALL_DIR already exists. Please run update or remove first."
-        exit 1
+        echo "Directory $INSTALL_DIR already exists. Upgrading the binary..."
     fi
 
-    echo "Cloning repository..."
-    git clone "$REPO_URL" "$INSTALL_DIR"
+    mkdir -p "$INSTALL_DIR"
+    mkdir -p "$INSTALL_DIR/data"
 
-    cd "$INSTALL_DIR" || exit
-    echo "Installing dependencies..."
-    npm install
+    echo "Downloading binary from GitHub Releases..."
+    curl -# -L "$DOWNLOAD_URL" -o "$INSTALL_DIR/$APP_NAME"
+    chmod +x "$INSTALL_DIR/$APP_NAME"
 
-    echo "Building application..."
-    npm run build
+    # Setup systemd if on Linux
+    if [ "$OS" = "Linux" ]; then
+        if command -v systemctl &> /dev/null; then
+            echo "Configuring systemd service (might require sudo password)..."
+            sudo bash -c "cat <<EOF > /etc/systemd/system/$SERVICE_NAME
+[Unit]
+Description=Simple Note Server
+After=network.target
 
-    echo "Starting app with PM2 on port 22099..."
-    PORT=22099 pm2 start server.js --name "$APP_NAME"
+[Service]
+Type=simple
+User=$USER
+ExecStart=$INSTALL_DIR/$APP_NAME
+WorkingDirectory=$INSTALL_DIR
+Restart=on-failure
+Environment=PORT=22099
 
-    echo "Saving PM2 process list..."
-    pm2 save
-
-    echo "Configuring auto-restart on system boot..."
-    # Lệnh này sẽ thiết lập systemd tự động chạy lại PM2 mỗi khi khởi động lại server
-    pm2 startup || echo "⚠️ Vui lòng chạy lệnh 'pm2 startup' thủ công để kích hoạt tự khởi động."
+[Install]
+WantedBy=multi-user.target
+EOF"
+            sudo systemctl daemon-reload
+            sudo systemctl enable $SERVICE_NAME
+            sudo systemctl restart $SERVICE_NAME
+            echo "Systemd service installed and started!"
+        else
+            echo "Systemd not found. Starting binary in background using nohup..."
+            cd "$INSTALL_DIR"
+            pkill -f "./$APP_NAME" || true
+            PORT=22099 nohup ./$APP_NAME > app.log 2>&1 &
+        fi
+    else
+        echo "Starting binary in background using nohup..."
+        cd "$INSTALL_DIR"
+        # kill existing if running
+        pkill -f "./$APP_NAME" || true
+        PORT=22099 nohup ./$APP_NAME > app.log 2>&1 &
+    fi
 
     echo "--------------------------------------------------"
     echo "✨ Simple Note installed successfully!"
@@ -67,33 +89,20 @@ function do_install() {
 
 function do_update() {
     echo "Updating Simple Note..."
-    if [ ! -d "$INSTALL_DIR" ]; then
-        echo "Simple Note is not installed in $INSTALL_DIR."
-        exit 1
-    fi
-
-    cd "$INSTALL_DIR" || exit
-    echo "Pulling latest changes..."
-    git pull
-
-    echo "Installing dependencies..."
-    npm install
-
-    echo "Building application..."
-    npm run build
-
-    echo "Restarting app..."
-    pm2 restart "$APP_NAME"
-
-    echo "✨ Simple Note updated successfully!"
+    do_install
 }
 
 function do_remove() {
     echo "Removing Simple Note..."
-    if command -v pm2 &> /dev/null; then
-        pm2 stop "$APP_NAME" 2>/dev/null
-        pm2 delete "$APP_NAME" 2>/dev/null
-        pm2 save --force
+
+    if [ "$OS" = "Linux" ] && command -v systemctl &> /dev/null; then
+        echo "Stopping systemd service..."
+        sudo systemctl stop $SERVICE_NAME 2>/dev/null
+        sudo systemctl disable $SERVICE_NAME 2>/dev/null
+        sudo rm -f /etc/systemd/system/$SERVICE_NAME
+        sudo systemctl daemon-reload
+    else
+        pkill -f "./$APP_NAME" || true
     fi
 
     if [ -d "$INSTALL_DIR" ]; then

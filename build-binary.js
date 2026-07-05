@@ -37,7 +37,7 @@ console.log('Converting to CommonJS with esbuild...');
 execSync('npx esbuild server.bundled.js --bundle --platform=node --format=cjs --outfile=server.cjs', { stdio: 'inherit' });
 
 console.log('Compiling native binaries with pkg...');
-execSync('npx pkg server.cjs --targets node18-macos-arm64,node18-linux-x64,node18-win-x64 --out-path dist-bin', { stdio: 'inherit' });
+execSync('npx pkg server.cjs --targets node18-macos-arm64,node18-macos-x64,node18-linux-x64,node18-win-x64 --out-path dist-bin', { stdio: 'inherit' });
 
 fs.unlinkSync('server.bundled.js');
 fs.unlinkSync('server.cjs');
