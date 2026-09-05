@@ -12,13 +12,10 @@ const NOTE_ID_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01
 const NOTE_ID_PATTERN = /^(?:[A-Za-z0-9]{9}|[A-Za-z0-9_-]{20,64})$/;
 
 const staticFiles = new Map([
-  ["/assets/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/assets/bundle.js", ["bundle.js", "text/javascript; charset=utf-8"]],
   ["/assets/style.css", ["style.css", "text/css; charset=utf-8"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]]
 ]);
-
-const vendorFiles = new Map([]);
 
 function newNoteId() {
   return Array.from(
@@ -102,12 +99,6 @@ export function createNoteServer({ dataDir = path.join(projectDir, "data") } = {
       if (request.method === "GET" && staticFiles.has(url.pathname)) {
         const [filename, contentType] = staticFiles.get(url.pathname);
         await serveFile(response, filename, contentType);
-        return;
-      }
-
-      if (request.method === "GET" && vendorFiles.has(url.pathname)) {
-        const [filename, contentType] = vendorFiles.get(url.pathname);
-        await serveFile(response, filename, contentType, "public, max-age=31536000, immutable");
         return;
       }
 

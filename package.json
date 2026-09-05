@@ -7,7 +7,6 @@
   "scripts": {
     "build": "esbuild public/app.js --bundle --outfile=public/bundle.js --minify",
     "start": "npm run build && node server.js",
-    "test": "node --test",
     "cleanup": "node cleanup.js"
   },
   "engines": {
@@ -19,9 +18,7 @@
     "@tiptap/extension-image": "^3.27.1",
     "@tiptap/extension-link": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
-    "dompurify": "^3.4.11",
     "lowlight": "^3.3.0",
-    "marked": "^18.0.5",
     "tiptap-markdown": "^0.9.0"
   },
   "devDependencies": {

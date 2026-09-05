@@ -114,7 +114,6 @@ body {
   background: #fffbe6;
 }
 
-textarea,
 .markdown-preview {
   position: absolute;
   inset: 0;
@@ -125,24 +124,6 @@ textarea,
   background: transparent;
   font-size: clamp(15px, 1.8vw, 17px);
   line-height: 1.65;
-}
-
-textarea {
-  resize: none;
-  border: 0;
-  border-radius: 12px;
-  outline: 0;
-  font: inherit;
-  font-size: clamp(16px, 2vw, 18px);
-  line-height: 1.75;
-  caret-color: #29291f;
-}
-
-textarea:focus-visible {
-  box-shadow: inset 0 0 0 2px rgba(151, 131, 50, 0.2);
-}
-
-.markdown-preview {
   overflow: auto;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   cursor: text;
@@ -292,10 +273,6 @@ textarea:focus-visible {
 
   .shell {
     width: 100%;
-  }
-
-  textarea {
-    padding: 16px 46px 16px 16px;
   }
 
   .markdown-preview {

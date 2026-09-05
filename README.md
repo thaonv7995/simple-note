@@ -73,5 +73,5 @@ If you prefer to run it manually without the script:
 ## Development
 
 - Start server: `PORT=3001 npm start`
-- Run tests: `npm test`
 - Build frontend: `npm run build`
+- Cleanup old notes: `npm run cleanup`

@@ -2,3 +2,17 @@ data/
 .DS_Store
 npm-debug.log*
 node_modules/
+
+# Build artifacts
+dist-bin/
+server.bundled.js
+server.cjs
+
+# Local binaries / scratch files
+server
+simple-note
+test-api
+test-api.cjs
+test-api.js
+test-bin
+test.js
